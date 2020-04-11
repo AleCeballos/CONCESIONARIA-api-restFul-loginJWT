@@ -115,10 +115,10 @@ public function show($id){
         return response()->json($data, 200);
 
     }
-
+//------------------------UPDATE--------------------------//
  public function update ($id, Request $request){
 
-    $hash = $request->header('Authorization',null);//cabecera de autorizacion
+        $hash = $request->header('Authorization',null);//cabecera de autorizacion
        
         $jwtAuth = new JwtAuth();
         $checkToken = $jwtAuth->checkToken($hash);//nos permite validar que el token es valido o no
@@ -172,5 +172,44 @@ public function show($id){
 
  }
   
+//------------------------DESTROY--------------------------//
+
+ public function destroy($id, Request $request){
+
+    $hash = $request->header('Authorization',null);//cabecera de autorizacion
+       
+    $jwtAuth = new JwtAuth();
+    $checkToken = $jwtAuth->checkToken($hash);//nos permite validar que el token es valido o no
+      
+    if($checkToken){
+//comprobar que existe el registro
+$car = Car::find($id);
+
+//borrarlo
+$car->delete();
+
+
+//devolverlo
+$data = array(
+
+'car' => $car,
+'status' => 'success',
+'code'=>200
+
+);
+
+ }else{
+ 
+    //devolver error
+    $data = array(
+
+     'status'=>'error',
+       'code'=>400,
+       'message'=>'Login incorrecto'
+   );
+   }
+
+   return response()->json($data, 200);
+}
 
 }
