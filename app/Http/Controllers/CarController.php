@@ -116,7 +116,61 @@ public function show($id){
 
     }
 
+ public function update ($id, Request $request){
 
+    $hash = $request->header('Authorization',null);//cabecera de autorizacion
+       
+        $jwtAuth = new JwtAuth();
+        $checkToken = $jwtAuth->checkToken($hash);//nos permite validar que el token es valido o no
+          
+        if($checkToken){
+        //si el token es valido actualizamos el coche 
+           
+        //agarro lo que llega por post
+          $json = $request->input('json', null);//sino llega nada se asigna null por defecto
+         $params = json_decode($json);
+         $params_array = json_decode($json,true);
+       //Validacion 
+     
+       $validate = \Validator::make($params_array,[
+
+        'title'=>'required',
+        'description'=>'required',
+        'price'=>'required',
+        'status'=>'required'
+
+        ]); 
+
+        if($validate->fails()){
+
+            return response()->json($validate->errors(),400);
+        }
+        //actualizamos el registro
+      $car = Car::where('id',$id)->update($params_array);
+
+      //esto es lo que devolvera en array
+      $data = array(
+
+        'car'=>$car,
+        'status'=>'success',
+        'code'=>200,
+    );
+        
+        }else{
+ 
+            //devolver error
+            $data = array(
+   
+               'message'=>'Login incorrecto',
+               'status'=>'error',
+               'code'=>300,
+           );
+           }
+   
+           return response()->json($data, 200);
+
+
+ }
   
 
 }
